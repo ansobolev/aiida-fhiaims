@@ -3,7 +3,7 @@ Data types provided by plugin
 
 Register data types via the "aiida.data" entry point in setup.json.
 """
-# You can directly use or subclass aiida.orm.data.Data
+# You can use it directly or subclass aiida.orm.data.Data
 # or any other data type listed under 'verdi data'
 from voluptuous import Optional, Schema
 
@@ -11,15 +11,15 @@ from aiida.orm import Dict
 
 # A subset of diff's command line options
 cmdline_options = {
-    Optional("ignore-case"): bool,
-    Optional("ignore-file-name-case"): bool,
-    Optional("ignore-tab-expansion"): bool,
-    Optional("ignore-space-change"): bool,
-    Optional("ignore-all-space"): bool,
+    # Optional("ignore-case"): bool,
+    # Optional("ignore-file-name-case"): bool,
+    # Optional("ignore-tab-expansion"): bool,
+    # Optional("ignore-space-change"): bool,
+    # Optional("ignore-all-space"): bool,
 }
 
 
-class DiffParameters(Dict):  # pylint: disable=too-many-ancestors
+class AimsParameters(Dict):  # pylint: disable=too-many-ancestors
     """
     Command line options for diff.
 
@@ -55,17 +55,17 @@ class DiffParameters(Dict):  # pylint: disable=too-many-ancestors
         :param type parameters_dict: dict
         :returns: validated dictionary
         """
-        return DiffParameters.schema(parameters_dict)
+        return AimsParameters.schema(parameters_dict)
 
     def cmdline_params(self, file1_name, file2_name):
         """Synthesize command line parameters.
 
         e.g. [ '--ignore-case', 'filename1', 'filename2']
 
-        :param file_name1: Name of first file
-        :param type file_name1: str
-        :param file_name2: Name of second file
-        :param type file_name2: str
+        :param file1_name: Name of first file
+        :param type file1_name: str
+        :param file2_name: Name of second file
+        :param type file2_name: str
 
         """
         parameters = []

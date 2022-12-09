@@ -22,8 +22,7 @@ executables = {
 
 def get_path_to_executable(executable):
     """Get path to local executable.
-    :param executable: Name of executable in the $PATH variable
-    :type executable: str
+    :param str executable: Name of executable in the $PATH variable
     :return: path to executable
     :rtype: str
     """

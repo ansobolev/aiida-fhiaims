@@ -35,7 +35,8 @@ testing = [
     "wheel~=0.31",
     "coverage[toml]",
     "pytest~=6.0",
-    "pytest-cov"
+    "pytest-cov",
+    "aiida-testing"
 ]
 pre-commit = [
     "pre-commit~=2.2",
@@ -50,16 +51,18 @@ docs = [
 ]
 
 [project.entry-points."aiida.data"]
-"fhiaims" = "aiida_fhiaims.data:DiffParameters"
+"species_default" = "aiida_fhiaims.data:SpeciesDefaultData"
 
 [project.entry-points."aiida.calculations"]
-"fhiaims" = "aiida_fhiaims.calculations:DiffCalculation"
+"fhiaims" = "aiida_fhiaims.calculations:AimsCalculation"
 
 [project.entry-points."aiida.parsers"]
-"fhiaims" = "aiida_fhiaims.parsers:DiffParser"
+"fhiaims.json" = "aiida_fhiaims.parsers:AimsJSONParser"
+"fhiaims.out" = "aiida_fhiaims.parsers:AimsOutParser"
+
 
 [project.entry-points."aiida.cmdline.data"]
-"fhiaims" = "aiida_fhiaims.cli:data_cli"
+"species_default" = "aiida_fhiaims.cli:species_default"
 
 [tool.flit.module]
 name = "aiida_fhiaims"
