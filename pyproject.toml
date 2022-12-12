@@ -50,19 +50,21 @@ docs = [
     "markupsafe<2.1"
 ]
 
+[project.entry-points."aiida.cmdline.data"]
+"species-defaults" = "aiida_fhiaims.cli.species_defaults:species_defaults"
+
 [project.entry-points."aiida.data"]
-"species_default" = "aiida_fhiaims.data:SpeciesDefaultData"
+"fhiaims.species_file" = "aiida_fhiaims.data.species_file:BasisFile"
+
+[project.entry-points."aiida.groups"]
+"fhiaims.species_family" = "aiida_fhiaims.data.species_family:BasisFamily"
 
 [project.entry-points."aiida.calculations"]
 "fhiaims" = "aiida_fhiaims.calculations:AimsCalculation"
 
 [project.entry-points."aiida.parsers"]
-"fhiaims.json" = "aiida_fhiaims.parsers:AimsJSONParser"
-"fhiaims.out" = "aiida_fhiaims.parsers:AimsOutParser"
-
-
-[project.entry-points."aiida.cmdline.data"]
-"species_default" = "aiida_fhiaims.cli:species_default"
+"fhiaims.json" = "aiida_fhiaims.parsers.aims_json:AimsJSONParser"
+"fhiaims.out" = "aiida_fhiaims.parsers.aims_out:AimsOutParser"
 
 [tool.flit.module]
 name = "aiida_fhiaims"

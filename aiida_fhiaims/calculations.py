@@ -3,13 +3,16 @@ Calculations provided by aiida_fhiaims.
 """
 from aiida.common import datastructures
 from aiida.engine import CalcJob
-from aiida.orm import StructureData, Dict
+from aiida.orm import Dict, StructureData
 
 
 class AimsCalculation(CalcJob):
     """
     AiiDA calculation plugin wrapping the aims.x executable.
     """
+
+    _OUTPUT_FILE_NAME = "aims.out"
+    _RETRIEVE_LIST = ["aims.json", _OUTPUT_FILE_NAME]
 
     @classmethod
     def define(cls, spec):
@@ -25,17 +28,19 @@ class AimsCalculation(CalcJob):
 
         # new ports
         spec.input(
-            "metadata.options.output_filename", valid_type=str, default="aims.out"
+            "metadata.options.output_filename",
+            valid_type=str,
+            default=cls._OUTPUT_FILE_NAME,
         )
         spec.input(
             "parameters",
             valid_type=Dict,
-            help="Command line parameters for diff",
+            help="FHI-aims parameters dictionary",
         )
         spec.input(
             "structure",
             valid_type=StructureData,
-            help="Atomic structure to be calculated"
+            help="Atomic structure to be calculated",
         )
         spec.output(
             "fhiaims.out",
@@ -80,6 +85,6 @@ class AimsCalculation(CalcJob):
                 self.inputs.file2.filename,
             ),
         ]
-        calc_info.retrieve_list = [self.metadata.options.output_filename]
+        calc_info.retrieve_list = self._RETRIEVE_LIST
 
         return calc_info

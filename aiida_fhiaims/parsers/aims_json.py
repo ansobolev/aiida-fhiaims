@@ -1,5 +1,5 @@
 """
-FHI-aims standard output parser for AiiDA
+FHI-aims standard JSON parser for AiiDA
 """
 
 from aiida.common import exceptions
