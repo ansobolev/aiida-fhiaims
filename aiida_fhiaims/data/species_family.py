@@ -2,12 +2,13 @@
 The class that represents Aims' `species_defaults` file family (light, tight, really_tight...)
 """
 from collections import defaultdict
+from collections.abc import Iterable
 from pathlib import Path
 import re
 
 from ase.data import chemical_symbols
 
-from aiida.orm import Group
+from aiida.orm import Group, StructureData
 
 from . import chemical_symbols
 from .species_file import BasisFile
@@ -57,7 +58,7 @@ class BasisFamily(Group):
         return family
 
     @property
-    def basis_files(self):
+    def basis_files(self) -> dict[str, dict[str, BasisFile]]:
         """A dictionary mapping elements to the basis files of the family"""
         if self._bases is None:
             self._bases = defaultdict(dict)
@@ -65,10 +66,49 @@ class BasisFamily(Group):
                 self._bases[f.setting].update({f.element: f})
         return self._bases
 
-    def elements(self, setting):
+    def elements(self, setting: str) -> list[str]:
         """A list of elements for which the basis files are present in the family with the given `setting`"""
         return list(self.basis_files[setting].keys())
 
-    def basis_file(self, element, setting):
+    def basis_file(self, element: str, setting: str) -> BasisFile:
         """A getter for the basis file from the family"""
-        return self.basis_files[setting][element]
+        if setting in self.basis_files:
+            if element in self.basis_files[element]:
+                return self.basis_files[setting][element]
+        raise ValueError(
+            f"Family {self.label} does not contain the basis file for element {element} with {setting} "
+            f"setting"
+        )
+
+    def get_species_defaults(
+        self,
+        setting: str,
+        elements: Iterable[str] = None,
+        structure: StructureData = None,
+    ) -> dict[str, BasisFile]:
+        """Returns the dictionary mapping the given `elements` (or elements of a given `structure`)
+        to basis files for a given `setting`. Loosely based upon `aiida_pseudo.groups.family.pseudo.get_pseudos`
+        """
+        if elements is not None and structure is not None:
+            raise ValueError(
+                "Cannot specify both keyword arguments `elements` and `structure`."
+            )
+
+        if elements is None and structure is None:
+            raise ValueError(
+                "Have to specify one of the keyword arguments `elements` and `structure`."
+            )
+
+        if elements is not None and not isinstance(elements, (list, tuple)):
+            raise ValueError("elements should be a list or tuple of symbols.")
+
+        if structure is not None and not isinstance(structure, StructureData):
+            raise ValueError("structure should be a `StructureData` instance.")
+
+        if structure is not None:
+            return {
+                kind.name: self.basis_file(kind.symbol, setting)
+                for kind in structure.kinds
+            }
+
+        return {element: self.basis_file(element, setting) for element in elements}

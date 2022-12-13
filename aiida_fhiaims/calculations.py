@@ -24,7 +24,7 @@ class AimsCalculation(CalcJob):
             "num_machines": 1,
             "num_mpiprocs_per_machine": 2,
         }
-        spec.inputs["metadata"]["options"]["parser_name"].default = "fhiaims"
+        spec.inputs["metadata"]["options"]["parser_name"].default = "fhiaims.json"
 
         # new ports
         spec.input(

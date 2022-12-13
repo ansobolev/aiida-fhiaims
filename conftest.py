@@ -3,7 +3,13 @@ from pathlib import Path
 
 import pytest
 
-pytest_plugins = ["aiida.manage.tests.pytest_fixtures"]
+pytest_plugins = [
+    "aiida.manage.tests.pytest_fixtures",
+    "aiida_testing.mock_code",
+    "aiida_testing.export_cache",
+]
+
+OUTPUT_FILES_DIR = Path(__file__).parent.resolve() / "tests" / "output_files"
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -12,9 +18,15 @@ def clear_database_auto(clear_database):  # pylint: disable=unused-argument
 
 
 @pytest.fixture(scope="function")
-def fhiaims_code(aiida_local_code_factory):
+def fhiaims_code(mock_code_factory):
     """Get a fhiaims code."""
-    return aiida_local_code_factory(executable="aims.x", entry_point="fhiaims")
+    return mock_code_factory(
+        label="fhiaims",
+        data_dir_abspath=OUTPUT_FILES_DIR,
+        entry_point="fhiaims",
+        # files *not* to copy into the data directory
+        ignore_files=("_aiidasubmit.sh", "file*"),
+    )
 
 
 @pytest.fixture

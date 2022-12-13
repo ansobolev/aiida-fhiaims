@@ -35,4 +35,4 @@ class TestDataCli:
         env = {"AIMS_SPECIES_DIR": species_path}
         # noinspection PyTypeChecker
         result = self.runner.invoke(install, catch_exceptions=False, env=env)
-        assert "Trying to install" in result.output
+        assert "OK" in result.output

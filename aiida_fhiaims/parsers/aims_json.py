@@ -1,10 +1,11 @@
 """
 FHI-aims standard JSON parser for AiiDA
 """
+import json
 
 from aiida.common import exceptions
 from aiida.engine import ExitCode
-from aiida.orm import SinglefileData
+from aiida.orm import Dict
 from aiida.parsers.parser import Parser
 from aiida.plugins import CalculationFactory
 
@@ -16,6 +17,8 @@ class AimsJSONParser(Parser):
     Parser class for parsing output of calculation.
     """
 
+    OUTPUT_FILE_NAME = "aims.json"
+
     def __init__(self, node):
         """
         Initialize Parser instance
@@ -26,6 +29,7 @@ class AimsJSONParser(Parser):
         :param type node: :class:`aiida.orm.nodes.process.process.ProcessNode`
         """
         super().__init__(node)
+        # noinspection PyTypeChecker
         if not issubclass(node.process_class, AimsCalculation):
             raise exceptions.ParsingError("Can only parse AimsCalculation")
 
@@ -35,11 +39,10 @@ class AimsJSONParser(Parser):
 
         :returns: an exit code, if parsing fails (or nothing if parsing succeeds)
         """
-        output_filename = self.node.get_option("output_filename")
 
         # Check that folder content is as expected
         files_retrieved = self.retrieved.list_object_names()
-        files_expected = [output_filename]
+        files_expected = [self.OUTPUT_FILE_NAME]
         # Note: set(A) <= set(B) checks whether A is a subset of B
         if not set(files_expected) <= set(files_retrieved):
             self.logger.error(
@@ -48,9 +51,10 @@ class AimsJSONParser(Parser):
             return self.exit_codes.ERROR_MISSING_OUTPUT_FILES
 
         # add output file
-        self.logger.info(f"Parsing '{output_filename}'")
-        with self.retrieved.open(output_filename, "rb") as handle:
-            output_node = SinglefileData(file=handle)
-        self.out("fhiaims", output_node)
+        self.logger.info(f"Parsing '{self.OUTPUT_FILE_NAME}'")
+        with self.retrieved.open(self.OUTPUT_FILE_NAME) as handle:
+            output = Dict(dict=json.load(handle))
+
+        self.out("fhiaims.out", output)
 
         return ExitCode(0)
