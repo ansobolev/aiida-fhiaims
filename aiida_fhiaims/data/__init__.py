@@ -1,93 +1,9 @@
-"""
-Data types provided by plugin
+"""Top-level file for aiida-fhiaims data nodes containing several submodule-wide constants"""
 
-Register data types via the "aiida.data" entry point in setup.json.
-"""
-# You can use it directly or subclass aiida.orm.data.Data
-# or any other data type listed under 'verdi data'
-from voluptuous import Optional, Schema
+from ase.data import chemical_symbols as symbols
 
-from aiida.orm import Dict
+__all__ = ("chemical_symbols",)
 
-# A subset of diff's command line options
-cmdline_options = {
-    # Optional("ignore-case"): bool,
-    # Optional("ignore-file-name-case"): bool,
-    # Optional("ignore-tab-expansion"): bool,
-    # Optional("ignore-space-change"): bool,
-    # Optional("ignore-all-space"): bool,
-}
-
-
-class AimsParameters(Dict):  # pylint: disable=too-many-ancestors
-    """
-    Command line options for diff.
-
-    This class represents a python dictionary used to
-    pass command line options to the executable.
-    """
-
-    # "voluptuous" schema  to add automatic validation
-    schema = Schema(cmdline_options)
-
-    # pylint: disable=redefined-builtin
-    def __init__(self, dict=None, **kwargs):
-        """
-        Constructor for the data class
-
-        Usage: ``DiffParameters(dict{'ignore-case': True})``
-
-        :param parameters_dict: dictionary with commandline parameters
-        :param type parameters_dict: dict
-
-        """
-        dict = self.validate(dict)
-        super().__init__(dict=dict, **kwargs)
-
-    def validate(self, parameters_dict):  # pylint: disable=no-self-use
-        """Validate command line options.
-
-        Uses the voluptuous package for validation. Find out about allowed keys using::
-
-            print(DiffParameters).schema.schema
-
-        :param parameters_dict: dictionary with commandline parameters
-        :param type parameters_dict: dict
-        :returns: validated dictionary
-        """
-        return AimsParameters.schema(parameters_dict)
-
-    def cmdline_params(self, file1_name, file2_name):
-        """Synthesize command line parameters.
-
-        e.g. [ '--ignore-case', 'filename1', 'filename2']
-
-        :param file1_name: Name of first file
-        :param type file1_name: str
-        :param file2_name: Name of second file
-        :param type file2_name: str
-
-        """
-        parameters = []
-
-        pm_dict = self.get_dict()
-        for k in pm_dict.keys():
-            if pm_dict[k]:
-                parameters += ["--" + k]
-
-        parameters += [file1_name, file2_name]
-
-        return [str(p) for p in parameters]
-
-    def __str__(self):
-        """String representation of node.
-
-        Append values of dictionary to usual representation. E.g.::
-
-            uuid: b416cbee-24e8-47a8-8c11-6d668770158b (pk: 590)
-            {'ignore-case': True}
-
-        """
-        string = super().__str__()
-        string += "\n" + str(self.get_dict())
-        return string
+chemical_symbols = [
+    "Emptium",
+] + symbols[1:]

@@ -21,9 +21,10 @@ class TestDataCli:
         # noinspection PyTypeChecker
         result = self.runner.invoke(install, species_path, catch_exceptions=False)
         assert "OK" in result.output
-        family = BasisFamily.collection.get(label="light")
+        family = BasisFamily.collection.get(label="good")
         assert len(family.basis_files) == 2
-        assert "As" in family.elements
+        assert "As" in family.elements("light")
+        assert "As" in family.elements("tight")
 
     def test_install_from_env_var(self, species_path):
         """A test to check if the basis family can be installed using `AIMS_SPECIES_DIR` environmental variable"""
