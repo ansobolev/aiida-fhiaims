@@ -2,9 +2,9 @@
 The class that represents Aims' `species_defaults` file family (light, tight, really_tight...)
 """
 from collections import defaultdict
-from collections.abc import Iterable
 from pathlib import Path
 import re
+from typing import Dict, List
 
 from ase.data import chemical_symbols
 
@@ -18,7 +18,7 @@ __all__ = ("BasisFamily",)
 name_re = re.compile(r"\d{2}_([A-Za-z]*)_default")
 
 
-def files_from_folder(folder: Path) -> list[BasisFile]:
+def files_from_folder(folder: Path) -> List[BasisFile]:
     """Parses a set of basis files from a `folder` to a collection of `BasisFile` nodes.
     Sets `setting` for the nodes to the folder name (light, tight...)"""
     basis_names = [f.name for f in folder.glob("*_default")]
@@ -58,7 +58,7 @@ class BasisFamily(Group):
         return family
 
     @property
-    def basis_files(self) -> dict[str, dict[str, BasisFile]]:
+    def basis_files(self) -> Dict[str, Dict[str, BasisFile]]:
         """A dictionary mapping elements to the basis files of the family"""
         if self._bases is None:
             self._bases = defaultdict(dict)
@@ -66,7 +66,7 @@ class BasisFamily(Group):
                 self._bases[f.setting].update({f.element: f})
         return self._bases
 
-    def elements(self, setting: str) -> list[str]:
+    def elements(self, setting: str) -> List[str]:
         """A list of elements for which the basis files are present in the family with the given `setting`"""
         return list(self.basis_files[setting].keys())
 
@@ -83,9 +83,9 @@ class BasisFamily(Group):
     def get_species_defaults(
         self,
         setting: str,
-        elements: Iterable[str] = None,
+        elements: List[str] = None,
         structure: StructureData = None,
-    ) -> dict[str, BasisFile]:
+    ) -> Dict[str, BasisFile]:
         """Returns the dictionary mapping the given `elements` (or elements of a given `structure`)
         to basis files for a given `setting`. Loosely based upon `aiida_pseudo.groups.family.pseudo.get_pseudos`
         """
