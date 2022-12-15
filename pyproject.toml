@@ -36,7 +36,7 @@ testing = [
     "coverage[toml]",
     "pytest~=6.0",
     "pytest-cov",
-    "aiida-testing"
+    "aiida-testing-dev"
 ]
 pre-commit = [
     "pre-commit~=2.2",
