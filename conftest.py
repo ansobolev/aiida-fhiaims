@@ -26,11 +26,17 @@ def fhiaims_code(mock_code_factory):
         data_dir_abspath=OUTPUT_FILES_DIR,
         entry_point="fhiaims",
         # files *not* to copy into the data directory
-        ignore_files=("_aiidasubmit.sh", "file*"),
+        ignore_files=("_aiidasubmit.sh", "_scheduler*"),
     )
 
 
 @pytest.fixture
 def species_path():
     """Get a species_defaults path as string"""
-    return (TEST_DIR / "species_defaults").as_posix()
+    return TEST_DIR / "species_defaults"
+
+
+@pytest.fixture
+def inputs_path():
+    """Get a species_defaults path as string"""
+    return TEST_DIR / "inputs"

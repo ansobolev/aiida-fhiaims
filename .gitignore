@@ -18,4 +18,4 @@ pip-wheel-metadata/
 
 # AiiDA internals
 .aiida_db/
-.aiida_testing_config.yml
+.aiida-testing-config.yml

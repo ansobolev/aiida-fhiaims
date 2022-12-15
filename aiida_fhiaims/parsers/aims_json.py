@@ -50,11 +50,19 @@ class AimsJSONParser(Parser):
             )
             return self.exit_codes.ERROR_MISSING_OUTPUT_FILES
 
-        # add output file
+        # add output node
         self.logger.info(f"Parsing '{self.OUTPUT_FILE_NAME}'")
         with self.retrieved.open(self.OUTPUT_FILE_NAME) as handle:
-            output = Dict(dict=json.load(handle))
+            output_data = json.load(handle)
+        # group similar records from json into Dict records
+        record_types = [r["record_type"] for r in output_data]
+        result = {}
+        for r_type in set(record_types):
+            records = [r for r in output_data if r["record_type"] == r_type]
+            if len(records) == 1:
+                result[r_type] = records[0]
+            else:
+                result[r_type] = records
 
-        self.out("fhiaims.out", output)
-
+        self.out("fhiaims.out", Dict(result))
         return ExitCode(0)

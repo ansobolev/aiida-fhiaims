@@ -12,6 +12,7 @@ from aiida.orm import Dict, StructureData
 
 from aiida_fhiaims.data.parameters import AimsParameters
 from aiida_fhiaims.data.species_family import BasisFamily
+from aiida_fhiaims.helpers import remove_headers
 
 
 class AimsCalculation(CalcJob):
@@ -87,6 +88,9 @@ class AimsCalculation(CalcJob):
             ase_struct.set_calculator(aims_calc)
             aims_calc.directory = folder.abspath
             aims_calc.write_input(ase_struct)
+            # the following is deleting all the time-specific info from inputs
+            remove_headers(folder.abspath)
+            (Path(folder.abspath) / "parameters.ase").unlink(missing_ok=True)
 
         code_info = datastructures.CodeInfo()
         code_info.code_uuid = self.inputs.code.uuid

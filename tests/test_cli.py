@@ -19,7 +19,9 @@ class TestDataCli:
         Tests that it can be reached and that it installs the test basis family
         """
         # noinspection PyTypeChecker
-        result = self.runner.invoke(install, species_path, catch_exceptions=False)
+        result = self.runner.invoke(
+            install, species_path.as_posix(), catch_exceptions=False
+        )
         assert "OK" in result.output
         family = BasisFamily.collection.get(label="good")
         assert len(family.basis_files) == 2
@@ -32,7 +34,7 @@ class TestDataCli:
         # noinspection PyTypeChecker
         result = self.runner.invoke(install, catch_exceptions=False, env=env)
         assert "Invalid value for 'PATH'" in result.output
-        env = {"AIMS_SPECIES_DIR": species_path}
+        env = {"AIMS_SPECIES_DIR": species_path.as_posix()}
         # noinspection PyTypeChecker
         result = self.runner.invoke(install, catch_exceptions=False, env=env)
         assert "OK" in result.output

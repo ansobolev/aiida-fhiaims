@@ -20,6 +20,6 @@ def test_parameters():
     params_as_dict = params.get_dict()
     assert (
         "relativistic" in params_as_dict
-        and params_as_dict["relativistic"] == "atomic-zora scalar"
+        and params_as_dict["relativistic"] == "atomic_zora scalar"
     )
     assert "output" in params_as_dict and "json_log" in params_as_dict["output"]
