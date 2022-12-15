@@ -61,23 +61,3 @@ def list_():  # pylint: disable=redefined-builtin
         obj = result[0]
         s += f"{str(obj)}, pk: {obj.pk}\n"
     sys.stdout.write(s)
-
-
-# @species_default_cli.command("export")
-# @click.argument("node", metavar="IDENTIFIER", type=DataParamType())
-# @click.option(
-#     "--outfile",
-#     "-o",
-#     type=click.Path(dir_okay=False),
-#     help="Write output to file (default: print to stdout).",
-# )
-# @decorators.with_dbenv()
-# def export(node, outfile):
-#     """Export an AimsParameters node (identified by PK, UUID or label) to plain text."""
-#     string = str(node)
-#
-#     if outfile:
-#         with open(outfile, "w") as f:
-#             f.write(string)
-#     else:
-#         click.echo(string)

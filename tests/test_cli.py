@@ -1,7 +1,7 @@
 """ Tests for command line interface of ."""
 from click.testing import CliRunner
 
-from aiida_fhiaims.cli.species_defaults import install
+from aiida_fhiaims.cli.species_defaults import install, list_
 from aiida_fhiaims.data.species_family import BasisFamily
 
 
@@ -38,3 +38,10 @@ class TestDataCli:
         # noinspection PyTypeChecker
         result = self.runner.invoke(install, catch_exceptions=False, env=env)
         assert "OK" in result.output
+
+    def test_list(self, species_family):
+        """A test of `list` command line option"""
+        _ = species_family(label="good")
+        # noinspection PyTypeChecker
+        result = self.runner.invoke(list_, catch_exceptions=False)
+        assert "good" in result.output
