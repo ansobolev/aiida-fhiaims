@@ -1,9 +1,17 @@
 """
 Calculations provided by aiida_fhiaims.
 """
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from ase.calculators.aims import Aims
+
 from aiida.common import datastructures
 from aiida.engine import CalcJob
 from aiida.orm import Dict, StructureData
+
+from aiida_fhiaims.data.parameters import AimsParameters
+from aiida_fhiaims.data.species_family import BasisFamily
 
 
 class AimsCalculation(CalcJob):
@@ -34,7 +42,7 @@ class AimsCalculation(CalcJob):
         )
         spec.input(
             "parameters",
-            valid_type=Dict,
+            valid_type=AimsParameters,
             help="FHI-aims parameters dictionary",
         )
         spec.input(
@@ -62,10 +70,25 @@ class AimsCalculation(CalcJob):
             place all files needed by the calculation.
         :return: `aiida.common.datastructures.CalcInfo` instance
         """
-        code_info = datastructures.CodeInfo()
-        code_info.cmdline_params = self.inputs.parameters.cmdline_params(
-            file1_name=self.inputs.file1.filename, file2_name=self.inputs.file2.filename
+        # prepare input objects
+        ase_struct = self.inputs.structure.get_ase()
+        control_params = self.inputs.parameters.get_dict()
+        # prepare input files
+        basis_family = control_params.pop("species_defaults")
+        bases = BasisFamily.get(label=basis_family["family"]).get_species_defaults(
+            setting=basis_family["setting"], structure=self.inputs.structure
         )
+        with TemporaryDirectory() as species_dir:
+            for basis_file in bases.values():
+                with open(Path(species_dir) / basis_file.filename, mode="w") as f:
+                    print(basis_file.get_content(), file=f)
+            control_params["species_dir"] = species_dir
+            aims_calc = Aims(**control_params)
+            ase_struct.set_calculator(aims_calc)
+            aims_calc.directory = folder.abspath
+            aims_calc.write_input(ase_struct)
+
+        code_info = datastructures.CodeInfo()
         code_info.code_uuid = self.inputs.code.uuid
         code_info.stdout_name = self.metadata.options.output_filename
         code_info.withmpi = self.inputs.metadata.options.withmpi
@@ -73,18 +96,7 @@ class AimsCalculation(CalcJob):
         # Prepare a `CalcInfo` to be returned to the engine
         calc_info = datastructures.CalcInfo()
         calc_info.codes_info = [code_info]
-        calc_info.local_copy_list = [
-            (
-                self.inputs.file1.uuid,
-                self.inputs.file1.filename,
-                self.inputs.file1.filename,
-            ),
-            (
-                self.inputs.file2.uuid,
-                self.inputs.file2.filename,
-                self.inputs.file2.filename,
-            ),
-        ]
+        calc_info.local_copy_list = []
         calc_info.retrieve_list = self._RETRIEVE_LIST
 
         return calc_info

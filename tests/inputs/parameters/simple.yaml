@@ -1,0 +1,5 @@
+xc: pbe
+k_grid: [8, 8, 8]
+species_defaults:
+  family: good
+  setting: light

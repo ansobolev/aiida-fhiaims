@@ -73,7 +73,7 @@ class BasisFamily(Group):
     def basis_file(self, element: str, setting: str) -> BasisFile:
         """A getter for the basis file from the family"""
         if setting in self.basis_files:
-            if element in self.basis_files[element]:
+            if element in self.basis_files[setting]:
                 return self.basis_files[setting][element]
         raise ValueError(
             f"Family {self.label} does not contain the basis file for element {element} with {setting} "

@@ -55,6 +55,7 @@ docs = [
 
 [project.entry-points."aiida.data"]
 "fhiaims.species_file" = "aiida_fhiaims.data.species_file:BasisFile"
+"fhiaims.parameters" = "aiida_fhiaims.data.parameters:AimsParameters"
 
 [project.entry-points."aiida.groups"]
 "fhiaims.species_family" = "aiida_fhiaims.data.species_family:BasisFamily"

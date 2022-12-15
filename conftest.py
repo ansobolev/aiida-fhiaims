@@ -1,15 +1,16 @@
 """pytest fixtures for simplified testing."""
-from pathlib import Path
-
 import pytest
+
+from tests import TEST_DIR
 
 pytest_plugins = [
     "aiida.manage.tests.pytest_fixtures",
     "aiida_testing.mock_code",
     "aiida_testing.export_cache",
+    "tests.fixtures",
 ]
 
-OUTPUT_FILES_DIR = Path(__file__).parent.resolve() / "tests" / "output_files"
+OUTPUT_FILES_DIR = TEST_DIR / "output_files"
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -32,4 +33,4 @@ def fhiaims_code(mock_code_factory):
 @pytest.fixture
 def species_path():
     """Get a species_defaults path as string"""
-    return (Path(__file__).parent.resolve() / "tests" / "species_defaults").as_posix()
+    return (TEST_DIR / "species_defaults").as_posix()

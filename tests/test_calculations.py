@@ -1,37 +1,22 @@
 """ Tests for calculations."""
-import os
-
-from aiida.engine import run
-from aiida.orm import SinglefileData
-from aiida.plugins import CalculationFactory, DataFactory
-
-from . import TEST_DIR
+from aiida.engine import run_get_node
+from aiida.plugins import CalculationFactory
 
 
-def test_process(fhiaims_code):
+def test_process(fhiaims_code, species_family, structure, parameters):
     """Test running a calculation
     note this does not test that the expected outputs are created of output parsing"""
-
     # Prepare input parameters
-    DiffParameters = DataFactory("fhiaims")
-    parameters = DiffParameters({"ignore-case": True})
-
-    file1 = SinglefileData(file=os.path.join(TEST_DIR, "input_files", "file1.txt"))
-    file2 = SinglefileData(file=os.path.join(TEST_DIR, "input_files", "file2.txt"))
+    ga_as_structure = structure("GaAs")
+    parameters = parameters("simple")
+    assert species_family(label=parameters["species_defaults"]["family"])
 
     # set up calculation
     inputs = {
         "code": fhiaims_code,
+        "structure": ga_as_structure,
         "parameters": parameters,
-        "file1": file1,
-        "file2": file2,
-        "metadata": {
-            "options": {"max_wallclock_seconds": 30},
-        },
     }
 
-    result = run(CalculationFactory("fhiaims"), **inputs)
-    computed_diff = result["fhiaims"].get_content()
-
-    assert "content1" in computed_diff
-    assert "content2" in computed_diff
+    _, node = run_get_node(CalculationFactory("fhiaims"), **inputs)
+    assert node.is_finished_ok
