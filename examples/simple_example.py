@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 """Run a test calculation on localhost.
 
-Usage: ./example_01.py
+Usage: ./simple_example.py
 """
-from os import path
+from pathlib import Path
 
+from ase.build import bulk
 import click
 
 from aiida import cmdline, engine
+from aiida.orm import StructureData
 from aiida.plugins import CalculationFactory, DataFactory
 
 from aiida_fhiaims import helpers
+from aiida_fhiaims.helpers import get_species_family
 
-INPUT_DIR = path.join(path.dirname(path.realpath(__file__)), "input_files")
+INPUT_DIR = Path(__file__).parent.resolve() / "input_files"
+SPECIES_DIR = Path(__file__).parent.resolve() / "species_defaults"
 
 
 def test_run(fhiaims_code):
@@ -24,21 +28,21 @@ def test_run(fhiaims_code):
         # get code
         computer = helpers.get_computer()
         fhiaims_code = helpers.get_code(entry_point="fhiaims", computer=computer)
+    _ = get_species_family("example_family", species_dir=SPECIES_DIR)
 
     # Prepare input parameters
-    DiffParameters = DataFactory("fhiaims")
-    parameters = DiffParameters({"ignore-case": True})
-
-    SinglefileData = DataFactory("singlefile")
-    file1 = SinglefileData(file=path.join(INPUT_DIR, "file1.txt"))
-    file2 = SinglefileData(file=path.join(INPUT_DIR, "file2.txt"))
+    ase_struct = bulk("Cu", "fcc", a=3.6)
+    parameters = {
+        "xc": "pbe",
+        "k_grid": [8, 8, 8],
+        "species_defaults": {"family": "example_family", "setting": "light"},
+    }
 
     # set up calculation
     inputs = {
         "code": fhiaims_code,
-        "parameters": parameters,
-        "file1": file1,
-        "file2": file2,
+        "structure": StructureData(ase=ase_struct),
+        "parameters": DataFactory("fhiaims.parameters")(dict=parameters),
         "metadata": {
             "description": "Test job submission with the aiida_fhiaims plugin",
         },

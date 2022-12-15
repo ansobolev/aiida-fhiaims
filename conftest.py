@@ -5,8 +5,6 @@ from tests import TEST_DIR
 
 pytest_plugins = [
     "aiida.manage.tests.pytest_fixtures",
-    "aiida_testing.mock_code",
-    "aiida_testing.export_cache",
     "tests.fixtures",
 ]
 
