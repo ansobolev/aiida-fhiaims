@@ -43,12 +43,27 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install -e .[testing]
-
+        pip install https://github.com/bboe/coveralls-python/archive/github_actions.zip
     - name: Run test suite
       env:
         # show timings of tests
         PYTEST_ADDOPTS: "--durations=0"
       run: pytest --cov aiida_fhiaims --cov-append .
+    - name: Submit to coveralls
+      env:
+        COVERALLS_PARALLEL: true
+        COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: coveralls
+
+  complete_coveralls:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        parallel-finished: true
 
 #  docs:
 #    runs-on: ubuntu-latest
