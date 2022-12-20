@@ -14,5 +14,5 @@ def test_computer():
 def test_code():
     """Test getting `Code` endpoint"""
     computer = get_computer()
-    code = get_code("fhiaims", computer)
+    code = get_code("fhiaims", computer, executable="diff")
     assert code.label == "aims.x"
