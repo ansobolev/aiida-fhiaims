@@ -33,7 +33,7 @@ def test_run(fhiaims_code):
     parameters = {
         "xc": "pbe",
         "k_grid": [8, 8, 8],
-        "species_defaults": {"family": "defaults_2020", "setting": "light"},
+        "species_defaults": {"family": "defaults_2020", "setting": "tight"},
     }
 
     # set up calculation
@@ -43,6 +43,12 @@ def test_run(fhiaims_code):
         "parameters": DataFactory("fhiaims.parameters")(dict=parameters),
         "metadata": {
             "description": "Test job submission with the aiida_fhiaims plugin",
+            "options": {
+                "resources": {
+                    "num_machines": 1,
+                    "num_mpiprocs_per_machine": 8,
+                }
+            },
         },
     }
 

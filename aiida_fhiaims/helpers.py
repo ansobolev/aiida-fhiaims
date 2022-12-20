@@ -4,7 +4,7 @@ import shutil
 import tempfile
 
 from aiida.common.exceptions import NotExistent
-from aiida.orm import Code, Computer
+from aiida.orm import Computer, InstalledCode
 
 from aiida_fhiaims.data.species_family import BasisFamily
 
@@ -50,7 +50,7 @@ def get_computer(name=LOCALHOST_NAME, workdir=None):
 
         computer = Computer(
             label=name,
-            description="localhost computer set up by aiida_diff tests",
+            description="localhost computer",
             hostname=name,
             workdir=workdir,
             transport_type="core.local",
@@ -75,16 +75,15 @@ def get_code(entry_point, computer, executable="aims.x"):
         :obj:`aiida.orm.nodes.data.code.Code`: The code node
     """
 
-    codes = Code.objects.find(  # pylint: disable=no-member
+    codes = InstalledCode.objects.find(  # pylint: disable=no-member
         filters={"label": executable}
     )
     if codes:
         return codes[0]
 
     path = shutil.which(executable)
-    code = Code(
-        input_plugin_name=entry_point,
-        remote_computer_exec=[computer, path],
+    code = InstalledCode(
+        input_plugin_name=entry_point, computer=computer, filepath_executable=path
     )
     code.label = executable
     return code.store()

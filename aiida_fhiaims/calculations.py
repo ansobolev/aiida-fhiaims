@@ -29,12 +29,12 @@ class AimsCalculation(CalcJob):
         super().define(spec)
 
         # set default values for AiiDA options
+        spec.inputs["metadata"]["options"]["withmpi"].default = True
         spec.inputs["metadata"]["options"]["resources"].default = {
             "num_machines": 1,
             "num_mpiprocs_per_machine": 2,
         }
         spec.inputs["metadata"]["options"]["parser_name"].default = "fhiaims.json"
-
         # new ports
         spec.input(
             "metadata.options.output_filename",
