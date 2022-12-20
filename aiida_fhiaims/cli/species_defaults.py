@@ -32,13 +32,15 @@ def install(path):
     """
     path = Path(path)
     echo.echo(f"Trying to install basis families from {path.absolute()}... ", nl=False)
-    dirs = [f for f in path.iterdir() if f.is_dir()]
+    # get all the directories with basis files two levels deep
+    files = path.rglob("*_default")
+    family_dirs = {f.parent.parent.resolve() for f in files}
+    if len(family_dirs) == 0:
+        echo.echo_critical("[FAILED]")
     families = []
-    for d in dirs:
-        try:
+    for d in family_dirs:
+        if d == path or path in d.parents:
             families.append(BasisFamily.from_folder(d, d.name))
-        except FileNotFoundError:
-            echo.echo_critical(" [FAILED]")
     echo.echo_success(" [OK]")
     family_data = [(f.label, f.pk) for f in families]
     echo.echo(

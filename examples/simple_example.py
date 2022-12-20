@@ -13,7 +13,6 @@ from aiida.orm import StructureData
 from aiida.plugins import CalculationFactory, DataFactory
 
 from aiida_fhiaims import helpers
-from aiida_fhiaims.helpers import get_species_family
 
 INPUT_DIR = Path(__file__).parent.resolve() / "input_files"
 SPECIES_DIR = Path(__file__).parent.resolve() / "species_defaults"
@@ -28,14 +27,13 @@ def test_run(fhiaims_code):
         # get code
         computer = helpers.get_computer()
         fhiaims_code = helpers.get_code(entry_point="fhiaims", computer=computer)
-    _ = get_species_family("example_family", species_dir=SPECIES_DIR)
 
     # Prepare input parameters
     ase_struct = bulk("Cu", "fcc", a=3.6)
     parameters = {
         "xc": "pbe",
         "k_grid": [8, 8, 8],
-        "species_defaults": {"family": "example_family", "setting": "light"},
+        "species_defaults": {"family": "defaults_2020", "setting": "light"},
     }
 
     # set up calculation
@@ -51,10 +49,10 @@ def test_run(fhiaims_code):
     # Note: in order to submit your calculation to the aiida daemon, do:
     # from aiida.engine import submit
     # future = submit(CalculationFactory('fhiaims'), **inputs)
-    result = engine.run(CalculationFactory("fhiaims"), **inputs)
+    _, node = engine.run_get_node(CalculationFactory("fhiaims"), **inputs)
 
-    computed_diff = result["fhiaims"].get_content()
-    print(f"Computed diff between files: \n{computed_diff}")
+    final_output = node.outputs.fhiaims.out.get_dict()["final_output"]
+    print(f"The final output: \n{final_output}")
 
 
 @click.command()

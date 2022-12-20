@@ -63,18 +63,18 @@ def get_computer(name=LOCALHOST_NAME, workdir=None):
     return computer
 
 
-def get_code(entry_point, computer):
+def get_code(entry_point, computer, executable="aims.x"):
     """Get local code.
     Sets up code for given entry point on given computer.
 
     Args:
         entry_point: Entry point of calculation plugin
         computer: (local) AiiDA computer
+        executable (str): a path to local executable
     Returns:
         :obj:`aiida.orm.nodes.data.code.Code`: The code node
     """
 
-    executable = "aims.x"
     codes = Code.objects.find(  # pylint: disable=no-member
         filters={"label": executable}
     )

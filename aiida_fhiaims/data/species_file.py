@@ -9,7 +9,7 @@ from . import chemical_symbols
 
 __all__ = ("BasisFile",)
 
-label_re = re.compile(r"([A-Za-z]*)_([A-Za-z]*)")
+label_re = re.compile(r"([A-Za-z]*)_([\w-]*)")
 
 
 class BasisFile(SinglefileData):

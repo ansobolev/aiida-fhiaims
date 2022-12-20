@@ -15,7 +15,7 @@ from .species_file import BasisFile
 
 __all__ = ("BasisFamily",)
 
-name_re = re.compile(r"\d{2}_([A-Za-z]*)_default")
+name_re = re.compile(r"\d{2,3}_([A-Za-z]*)_default")
 
 
 def files_from_folder(folder: Path) -> List[BasisFile]:
@@ -25,7 +25,11 @@ def files_from_folder(folder: Path) -> List[BasisFile]:
     if len(basis_names) == 0:
         raise FileNotFoundError(f"Folder {folder.as_posix()} contains no basis files")
 
-    labels = [name_re.match(f_name).groups()[0] for f_name in basis_names]
+    labels = [
+        name_re.match(f_name).groups()[0]
+        for f_name in basis_names
+        if name_re.match(f_name) is not None
+    ]
     assert all(label in chemical_symbols for label in labels)
     bases = [
         BasisFile(folder / f_name, element=label, setting=folder.name)
@@ -45,11 +49,18 @@ class BasisFamily(Group):
     @classmethod
     def from_folder(cls, folder: Path, label: str = None) -> "BasisFamily":
         """Gets basis file family node from a `folder`, sets its label to `label`"""
+
+        # we call the directory `settings dir` if it's inside a folder and there are *_default files inside it
+        setting_dirs = [
+            d for d in folder.iterdir() if d.is_dir() and list(d.glob("*_default"))
+        ]
+        if not setting_dirs:
+            raise FileNotFoundError(f"No species_defaults files found inside {folder}")
+
         if label is None:
             label = folder.name
         family = cls(label=label, description=f"{label} species_defaults family")
         family.store()
-        setting_dirs = [d for d in folder.iterdir() if d.is_dir()]
 
         for d in setting_dirs:
             setting_folder = folder / d

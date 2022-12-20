@@ -42,3 +42,9 @@ def species_family(species_path):
         return BasisFamily.from_folder(species_folder, label=label)
 
     return _get_species_family
+
+
+@pytest.fixture
+def default_species_family(species_family):  # pylint: disable=redefined-outer-name
+    """A fixture returning a stored species family with 'default' label"""
+    return species_family("default")
